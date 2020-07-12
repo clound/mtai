@@ -1,0 +1,48 @@
+@import 'variables';
+.ant-layout {
+  height: 100%;
+  padding: 0;
+  .header {
+    display: flex;
+    padding: 0 20px;
+    flex: row;
+    align-items: center;
+    .logo {
+      flex: 0 0 220px;
+      // width: 200px;
+      // height: 32px;
+      color: #ffffff;
+      font-size: 24px;
+    }
+    .menuIcon { 
+      // flex: 1;
+      font-size: 24px;
+      color: #fff;
+    }
+    .header-menu {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      background-color: #001529;
+    }
+  }
+  .ant-layout-sider-collapsed {
+    .anticon {
+      font-size: 16px;
+      // margin-left: 8px;
+    }
+    .nav-text {
+      display: none;
+    }
+    .ant-menu-submenu-vertical > .ant-menu-submenu-title:after {
+      display: none;
+    }
+    .ant-menu-dark:not(.ant-menu-inline) .ant-menu-submenu-open {
+      color: inherit;
+    }
+  }
+  p {
+    margin: 10px 0 10px 0;
+  }
+}
