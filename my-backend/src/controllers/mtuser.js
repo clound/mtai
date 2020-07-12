@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:58:46
- * @LastEditTime: 2020-07-11 22:49:10
+ * @LastEditTime: 2020-07-12 14:16:57
  */ 
 const MtUser = require('../models').mtuser
 const MtUserInfo = require('../models').mtuserinfo
@@ -107,14 +107,18 @@ module.exports = {
   },
   // 获取所有用户详细信息
   getAllUserInfo (ctx) {
-    console.log(ctx.request.body)
-    let { page = 1, limit = 20 } = ctx.request.body
+    // console.log(ctx.request.body)
+    let { phone, choosed, page = 1, limit = 20 } = ctx.request.body
     return MtUser.findAndCountAll({
       offset: (page - 1) * limit,
       limit: limit,
       attributes: ['id', 'phone'],
-      include:{ model: MtUserInfo, as: 'mtuserinfo' },
-      // where: {name: ctx.body.name}
+      include:{
+        model: MtUserInfo,
+        as: 'mtuserinfo',
+        ...(choosed ? { where: { choosed } } : '')
+      },
+      ...(phone ? { where: { phone } } : '')
     }).then(data => {
       ctx.body = {...Tips[0], data }
     })   

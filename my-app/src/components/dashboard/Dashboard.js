@@ -1,8 +1,8 @@
 import React from 'react'
-import { Row, Col, Card, Timeline, Icon } from 'antd'
+import { Row, Col, Card } from 'antd'
 import BreadcrumbCustom from '../BreadcrumbCustom'
 import { getStatistic } from '@/serve'
-
+// import { TeamOutlined } from '@ant-design/icons'
 // import EchartsViews from './EchartsViews'
 // import EchartsProjects from './EchartsProjects'
 // import b1 from '../../style/imgs/b1.jpg'
@@ -15,7 +15,9 @@ class Dashboard extends React.Component {
   }
   
   componentDidMount() {
-    this.fetch()
+    setTimeout(() => {
+      this.fetch()
+    }, 20)
   }
   
   fetch = () => {
@@ -41,7 +43,8 @@ class Dashboard extends React.Component {
               <Card bordered={false}>
                 <div className="clear y-center">
                   <div className="pull-left mr-m">
-                    <Icon type="heart" className="text-2x text-danger" />
+                    {/* <TeamOutlined className="text-2x text-danger"/>   */}
+                    {/* <Icon type="heart" className="text-2x text-danger" /> */}
                   </div>
                   <div className="clear">
                     <div className="text-muted">账号总数</div>

@@ -3,10 +3,10 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-12 15:21:59
- * @LastEditTime: 2020-06-15 10:43:19
+ * @LastEditTime: 2020-07-12 14:28:11
  */ 
 import React from 'react'
-import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import NotFound from '@/components/pages/NotFound'
 import Login from '@/components/pages/Login'
 import App from '@/entry/App'

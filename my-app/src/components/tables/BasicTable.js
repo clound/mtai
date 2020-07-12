@@ -3,11 +3,11 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-17 17:12:35
- * @LastEditTime: 2020-07-11 22:57:24
+ * @LastEditTime: 2020-07-12 16:09:59
  */
 
 import React from 'react'
-import { Space, Button, Table, Avatar, Input, Modal, Form, Upload, message, notification, Tag } from 'antd';
+import { Space, Button, Switch, Table, Input, Modal, Form, Upload, message, notification, Tag } from 'antd';
 import { UserAddOutlined, CloudUploadOutlined, SyncOutlined } from '@ant-design/icons'
 import { parseTime, importExcel } from '@/utils'
 import { importAccounts, addAccount, refreshInfo, getUserInfos } from '@/serve'
@@ -91,8 +91,10 @@ class BasicTable extends React.Component {
     visible: false,
     data: [],
     pagination: {
+      phone: '',
+      hit: false,
       current: 1,
-      pageSize: 10,
+      pageSize: 20,
     },
     loading: false,
   };
@@ -131,34 +133,29 @@ class BasicTable extends React.Component {
     });
   }
 
-  handleTableChange = (pagination, filters, sorter) => {
-    this.fetch({
-      sortField: sorter.field,
-      sortOrder: sorter.order,
+  handleTableChange = (pagination) => {
+    this.fetch(
+      // sortField: sorter.field,
+      // sortOrder: sorter.order,
       pagination,
-      ...filters,
-    });
-    // getUserInfos().then(res => {
-    //   console.log(res)
-    // })
+    );
   };
 
   fetch = (params = {}) => {
     this.setState({ loading: true });
-    console.log(params)
     getUserInfos(params).then(res => {
-      let data = res.data.rows && res.data.rows.map(v => {
+      let data = (res.data.rows && res.data.rows.map(v => {
         return {
           id: v.id,
           phone: v.phone,
           ...v.mtuserinfo
         }
-      }) || []
+      })) || []
       this.setState({
         loading: false,
         data,
         pagination: {
-          ...params.pagination,
+          ...params,
           total: res.data.count,
           // 200 is mock data, you should read it from server
           // total: data.totalCount,
@@ -167,7 +164,22 @@ class BasicTable extends React.Component {
     })
   };
   searchAccount = (value) => {
-    console.log(value);
+    if (value && !/^1[1-9][0-9]{9}$/.test(value)) {
+      message.warning('请输入合法的手机号！')
+      return
+    }
+    let data = Object.assign({}, this.state.pagination, { phone: value })
+    this.setState({
+      pagination: data
+    })
+    this.fetch(data)
+  }
+  onFilterHit = (value) => {
+    let data = Object.assign({}, this.state.pagination, { hit: value })
+    this.setState({
+      pagination: data
+    })
+    this.fetch(data)
   }
   uploadAccount = (data) => {
     this.setState({
@@ -238,6 +250,10 @@ class BasicTable extends React.Component {
                 shape="round" onClick={this.refresh}>
                 刷新
               </Button>
+              <Switch
+                checkedChildren="中签"
+                unCheckedChildren="全部"
+                onChange={this.onFilterHit} />
           </Space>
         </div>
         <Table

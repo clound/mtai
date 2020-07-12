@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Menu, Layout, Badge, Popover } from 'antd'
+import { Menu, Layout } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
-import { BarsOutlined, MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, ArrowsAltOutlined } from '@ant-design/icons'
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
-import SiderCustom from './SiderCustom'
+import { setAuth } from '@/store/actions/app'
+
 // import { gitOauthToken, gitOauthInfo } from '@/serve'
-import { queryString } from '@/utils'
+// import { queryString } from '@/utils'
 const { Header } = Layout
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
@@ -17,22 +18,16 @@ class HeaderCustom extends Component {
     visible: false,
   }
   componentDidMount() {
-    const QueryString = queryString()
-    const _user = JSON.parse(localStorage.getItem('user')) || '测试'
-    if (!_user && QueryString.hasOwnProperty('code')) {
-      // gitOauthToken(QueryString.code).then((res) => {
-      //   gitOauthInfo(res.access_token).then((info) => {
-      //     this.setState({
-      //       user: info,
-      //     })
-      //   })
-      // })
-      localStorage.setItem('user', JSON.stringify({}))
-    } else {
-      this.setState({
-        user: _user,
-      })
-    }
+    // const QueryString = queryString()
+    // const _user = JSON.parse(localStorage.getItem('user')) || '测试'
+    // if (!_user && QueryString.hasOwnProperty('code')) {
+    //   localStorage.setItem('user', JSON.stringify({}))
+    // } else {
+    // let { auth } = this.props
+    // this.setState({
+    //   user: (auth && auth.data.username) || '',
+    // })
+    // }
   }
   screenFull = () => {
   //   if (screenfull.enabled) {
@@ -40,11 +35,12 @@ class HeaderCustom extends Component {
   //   }
   }
   menuClick = (e) => {
-    console.log(e)
+    // console.log(e)
     e.key === 'logout' && this.logout()
   }
   logout = () => {
-    localStorage.removeItem('user')
+    // localStorage.removeItem('user')
+    setAuth({})
     this.props.history.push('/login')
   }
   popoverHide = () => {
@@ -56,8 +52,9 @@ class HeaderCustom extends Component {
     this.setState({ visible })
   }
   render() {
-    const { responsive = { data: {} }, path } = this.props
-    console.log(this.props.collapsed);
+    // const { responsive = { data: {} }, path } = this.props
+    let { auth } = this.props
+    let username = (auth && auth.data.username) || ''
     return (
       <Header className="custom-theme header">
         <div className="logo">茅台账号管理后台</div>
@@ -92,7 +89,7 @@ class HeaderCustom extends Component {
           >
             <MenuItemGroup title="用户中心">
               <Menu.Item key="setting:1">
-                你好 - {this.props.user.userName}
+                你好 - {username}
               </Menu.Item>
               {/* <Menu.Item key="setting:2">个人信息</Menu.Item> */}
               <Menu.Item key="logout">
@@ -110,9 +107,13 @@ class HeaderCustom extends Component {
   }
 }
 const mapStatetoProps = state=> {
-  let { responsive } = state
+  let { auth, responsive } = state.app
   return {
+    auth,
     responsive
   }
 }
-export default withRouter(connect(mapStatetoProps)(HeaderCustom))
+const mapDispatchToProps = {
+  setAuth
+}
+export default withRouter(connect(mapStatetoProps, mapDispatchToProps)(HeaderCustom))

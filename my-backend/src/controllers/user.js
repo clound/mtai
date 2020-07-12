@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-17 15:09:49
- * @LastEditTime: 2020-06-17 16:09:31
+ * @LastEditTime: 2020-07-12 16:33:04
  */ 
 const User = require('../models').user
 const UserCheckIn = require('../models').usercheckin
@@ -23,27 +23,38 @@ module.exports = {
     })
     .catch(error => res.status(400).send(error))
   },
-  login(req, res) {
-    return User.getUsers({
+  login(ctx) {
+    let { username, password } = ctx.request.body
+    return User.findOne({
       where: {
-        name: req.body.username,
-        password: sha1(req.body.password)
+        name: username,
+        password
       }
     }).then(user => {
       if (user) {
-        let jwt = new JwtUtil({id: user.id, name: req.body.username})
-        let userCheckIn = UserCheckIn.build({'loginIp': req.hostname})
-        user.setCheckIn(userCheckIn)
-        res.send({
-          code: 0,
-          token: jwt.generateToken(),
-          msg: 'ok'
-        })
+        ctx.body = {
+          ...Tips[0]
+        }
+        // let jwt = new JwtUtil({id: user.id, name: req.body.username})
+        // let userCheckIn = UserCheckIn.build({'loginIp': req.hostname})
+        // user.setCheckIn(userCheckIn)
+        // res.send({
+        //   code: 0,
+        //   token: jwt.generateToken(),
+        //   msg: 'ok'
+        // })
       } else {
-        res.send(Tips[1006])
+        ctx.body = {
+          ...Tips[1006]
+        }
       }
     })   
-    .catch(error => res.status(400).send(error))
+    .catch(error => {
+      ctx.body = {
+        ...Tips[1009],
+        error
+      }
+    })
   },
   getUserInfo(ctx) {
     return User.findOne({

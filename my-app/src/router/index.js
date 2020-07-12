@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-12 14:26:00
- * @LastEditTime: 2020-07-11 10:19:03
+ * @LastEditTime: 2020-07-12 15:46:14
  */ 
 import React, { Component } from 'react'
 import { Route, Redirect, Switch } from 'react-router-dom'
@@ -22,11 +22,14 @@ export default class CRouter extends Component {
   }
   requireLogin = (component, permission) => {
     const { auth } = this.props
-    const { permissions } = auth.data
-    if (process.env.NODE_ENV === 'production' && !permissions) {
+    const { username } = auth.data
+    console.log(auth);
+    if (process.env.NODE_ENV === 'development' && !username) {
+      console.log('------------------');
       // 线上环境判断是否登录
       return <Redirect to={'/login'} />
     }
+    console.log(component)
     return permission ? this.requireAuth(permission, component) : component
   }
   render() {
@@ -36,7 +39,6 @@ export default class CRouter extends Component {
           routesConfig[key].map((r) => {
             const route = (r) => {
               const Component = AllComponents[r.component]
-              // console.log(Component)
               return (
                 <Route
                   key={r.route || r.key}

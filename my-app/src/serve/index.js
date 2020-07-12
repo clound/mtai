@@ -3,16 +3,26 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-12 14:25:32
- * @LastEditTime: 2020-07-11 21:53:08
+ * @LastEditTime: 2020-07-12 16:17:18
  */
 import { commonGet, commonPost } from './tools'
 export const getImgs = function () {
   return commonGet('/crawel/list')
 }
+// 登录
+export const login = function (params) {
+  let { username, password } = { ...params }
+  return commonPost('/user/login', {
+    username,
+    password
+  })  
+}
 // 获取所有数据信息
 export const getUserInfos = function (params) {
-  let { current, pageSize } = { ...params }
+  let { phone, hit, current, pageSize } = { ...params }
   return commonPost('/mtai/getUserInfos', {
+    ...(phone ? { phone } : ''),
+    ...(hit ? { choosed: true } : ''),
     page: current,
     limit: pageSize
   })  

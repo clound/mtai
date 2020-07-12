@@ -1,3 +1,10 @@
+/*
+ * @Descripttion: File Description
+ * @version: 0.0.1
+ * @Author: cloud
+ * @Date: 2020-06-05 16:43:53
+ * @LastEditTime: 2020-07-12 16:06:04
+ */ 
 import React, { Component } from 'react'
 import { Layout } from 'antd'
 import Routes from '@/router'
@@ -7,46 +14,31 @@ import { connect } from 'react-redux'
 import { setResponsive } from '@/store/actions/app'
 import './App.less'
 
-const { Content, Footer } = Layout
+const { Content } = Layout
 
 class App extends Component {
   state = {
     collapsed: false,
     title: '',
   }
-  _resizeThrottled = false
   componentDidMount() {
     console.log(this.props)
     // const { setAlitaState } = this.props
     // let user = umbrella.getLocalStorage('user')
     // user && setAlitaState({ stateName: 'auth', data: user })
-    this.getClientWidth()
-    this.handleResize()
+    // this.getClientWidth()
+    // window.onresize = () => {
+      // console.log('屏幕变化了');
+      // this.getClientWidth();
+      // this.handleResize()
+    // } 
     // this.openFNotification()
     // this.fetchSmenu()
-  }
-
-  handleResize = () => {
-    window.addEventListener('resize', this.resizeListener)
-  }
-
-  resizeListener = () => {
-    const delay = 250
-    if (!this._resizeThrottled) {
-      this._resizeThrottled = true
-      const timer = setTimeout(() => {
-        this.getClientWidth()
-
-        this._resizeThrottled = false
-        clearTimeout(timer)
-      }, delay)
-    }
   }
   getClientWidth = () => {
     // 获取当前浏览器宽度并设置responsive管理响应式
     const { setResponsive } = this.props
     const clientWidth = window.innerWidth
-    console.log(clientWidth)
     setResponsive({
       type: 'RESPONSIVE',
       data: { isMobile: clientWidth <= 992 },
@@ -88,7 +80,7 @@ class App extends Component {
   }
 }
 const mapStatetoProps = (state) => {
-  let { auth, responsive } = state
+  let { auth, responsive } = state.app
   return { 
     auth,
     responsive
