@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-12 14:26:00
- * @LastEditTime: 2020-07-12 15:46:14
+ * @LastEditTime: 2020-07-12 16:52:25
  */ 
 import React, { Component } from 'react'
 import { Route, Redirect, Switch } from 'react-router-dom'
@@ -24,8 +24,8 @@ export default class CRouter extends Component {
     const { auth } = this.props
     const { username } = auth.data
     console.log(auth);
-    if (process.env.NODE_ENV === 'development' && !username) {
-      console.log('------------------');
+    if (process.env.NODE_ENV === 'production' && !username) {
+      // console.log('------------------');
       // 线上环境判断是否登录
       return <Redirect to={'/login'} />
     }
