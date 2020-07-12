@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-12 16:49:26
- * @LastEditTime: 2020-07-11 16:30:14
+ * @LastEditTime: 2020-07-12 18:22:13
  */
 
 import axios from 'axios'
@@ -11,7 +11,7 @@ import { message } from 'antd'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? '/' : 'http://127.0.0.1:3000', // api的base_url
+  baseURL: process.env.NODE_ENV === 'production' ? '/mt' : 'http://127.0.0.1:3000', // api的base_url
   timeout: 1200000, // 请求超时时间
 })
 

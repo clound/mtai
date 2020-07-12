@@ -3,17 +3,17 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-12 16:57:11
- * @LastEditTime: 2020-07-12 17:30:08
+ * @LastEditTime: 2020-07-12 18:55:08
  */ 
-import loadable from '@loadable/component'
+// import loadable from '@loadable/component'
 // import Loading from './widget/Loading'
 // import BasicForm from './forms/BasicForm'
-const BasicTable = loadable({ loader: () => import('./tables/BasicTable') })
-const Spins = loadable({ loader: () => import('./ui/Spins') })
-const Dashboard = loadable({ loader: () => import('./dashboard/Dashboard') })
-// import BasicTable from './tables/BasicTable'
-// import Spins from './ui/Spins'
-// import Dashboard from './dashboard/Dashboard'
+// const BasicTable = loadable({ loader: () => import('./tables/BasicTable') })
+// const Spins = loadable({ loader: () => import('./ui/Spins') })
+// const Dashboard = loadable({ loader: () => import('./dashboard/Dashboard') })
+import BasicTable from './tables/BasicTable'
+import Spins from './ui/Spins'
+import Dashboard from './dashboard/Dashboard'
 // import AdvancedTable from './tables/AdvancedTables'
 // import AsynchronousTable from './tables/AsynchronousTable'
 // import Echarts from './charts/Echarts'
