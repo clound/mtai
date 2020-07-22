@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:58:46
- * @LastEditTime: 2020-07-12 14:16:57
+ * @LastEditTime: 2020-07-22 12:12:10
  */ 
 const MtUser = require('../models').mtuser
 const MtUserInfo = require('../models').mtuserinfo
@@ -18,7 +18,14 @@ function randomStr() {
 module.exports = {
   create(ctx) {
     let { phone, passwd } = ctx.request.body
-    return MtUser.create({
+    if (!ctx.session.user) {
+      ctx.body = {
+        ...Tips[1007]
+      }
+      return
+    }
+    return MtUser.upsert({
+      mtuser_id: ctx.session.user.id,
       phone,
       passwd,
       unique: randomStr()
@@ -34,34 +41,115 @@ module.exports = {
       }
     )
   },
+  update(ctx) {
+    let { id, phone, passwd } = ctx.request.body
+    if (!ctx.session.user) {
+      ctx.body = {
+        ...Tips[1007]
+      }
+      return
+    }
+    return MtUser.update({
+      phone,
+      passwd
+    }, {
+      where: {
+        id
+      }
+    })
+    .then(user => {
+      ctx.body = {
+        ...Tips[0]
+      }
+    })
+    .catch(error => {
+      console.log(error)
+      ctx.body = {
+        ...Tips[1009],
+        error
+      }
+    } 
+    )
+  },
+  delete(ctx) {
+    let { id } = ctx.request.body
+    if (!ctx.session.user) {
+      ctx.body = {
+        ...Tips[1007]
+      }
+      return
+    }
+    return MtUserInfo.destroy({
+      where: {
+        user_id: id
+      },
+      force: true
+    }).then(data => {
+      return MtUser.destroy({
+        where: {
+          id
+        },
+        force: true
+      }).then(data => {
+        ctx.body = {
+          ...Tips[0]
+        }
+      }).catch(error => {
+        ctx.body = {
+          ...Tips[1009],
+          error
+        }
+      })
+    })
+    .catch(error => {
+      console.log(error)
+      ctx.body = {
+        ...Tips[1009],
+        error
+      }
+    })
+  },
   bulkCreate(ctx) {
+    if (!ctx.session.user) {
+      ctx.body = {
+        ...Tips[1009]
+      }
+      return
+    }
     let { data: users } = ctx.request.body
     users = users.map(v => {
       return {
         ...v,
+        mtuser_id: ctx.session.user.id || '',
         unique: randomStr()
       }
     })
     // console.log(users)
     return MtUser.bulkCreate(users, { 
-      fields:["phone", "passwd", "unique"],
+      fields:["phone", "passwd", "unique", "mtuser_id"],
       updateOnDuplicate: ['passwd']
     })
       .then(user => {
         ctx.body = {
-          ...Tips[0]
+          ...Tips[0],
+          msg: 'success'
         }
       })
       .catch(error => {
         console.log(error);
         ctx.body = {
+          ...Tips[1009],
           error
         }
       })
   },
   getReqUsers(ctx) {
+    let { id, name } = ctx.session.user
     return MtUser.findAndCountAll({
-      attributes: ['id', 'phone', 'passwd', 'unique']
+      attributes: ['id', 'phone', 'passwd', 'unique'],
+      where: {
+        ...(name !== 'Clound602' ? { mtuser_id: id } : ''),
+      }
     })
   },
   // 更新用户信息
@@ -88,26 +176,40 @@ module.exports = {
       orderCreated 
     })
   },
-  // 获取所有用户数
-  getUsers(ctx) {
-    return MtUser.count()
-    .then(data => {
-      ctx.body = {
-        ...Tips[0],
-        count: data
-      }
-    }
-    )
-    .catch(error => {
-      console.log(error);
-      ctx.body = {
-        error
-      }
+  // 获取所属用户数
+  async getAccounts(ctx) {
+    let { id, name } = ctx.session.user
+    let hitCount = await MtUser.count({
+      include:{
+        model: MtUserInfo,
+        as: 'mtuserinfo',
+        where: {
+          choosed: true
+        }
+      },
+      ...(name !== 'Clound602' ? {
+          where: {
+            mtuser_id: id
+          }} : ''
+        )
     })
+    let mtUsers = await MtUser.count({
+      ...(name !== 'Clound602' ? {
+        where: {
+          mtuser_id: id
+        }} : ''
+      )
+    })
+    ctx.body = {
+      ...Tips[0],
+      count: mtUsers,
+      hit: hitCount
+    }
   },
   // 获取所有用户详细信息
   getAllUserInfo (ctx) {
     // console.log(ctx.request.body)
+    let { id, name } = ctx.session.user
     let { phone, choosed, page = 1, limit = 20 } = ctx.request.body
     return MtUser.findAndCountAll({
       offset: (page - 1) * limit,
@@ -116,9 +218,12 @@ module.exports = {
       include:{
         model: MtUserInfo,
         as: 'mtuserinfo',
-        ...(choosed ? { where: { choosed } } : '')
+        ...(choosed === 'true' ? { where: { choosed } } : '')
       },
-      ...(phone ? { where: { phone } } : '')
+      where: {
+        ...(name !== 'Clound602' ? { mtuser_id: id } : ''),
+        ...(phone ? phone : '')
+      }
     }).then(data => {
       ctx.body = {...Tips[0], data }
     })   
@@ -126,10 +231,5 @@ module.exports = {
       console.log(error);
       ctx.body = { error }
     })
-  },
-  logout(req, res) {
-    let jwt = new JwtUtil({id: req.api_token.id, name: req.api_token.name})
-    jwt.expireToken()
-    return res.send({...Tips[0]})
   }
 }

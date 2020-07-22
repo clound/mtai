@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-17 15:10:59
- * @LastEditTime: 2020-06-17 15:42:52
+ * @LastEditTime: 2020-07-19 21:43:19
  */ 
 module.exports = {
   0: {
@@ -17,6 +17,10 @@ module.exports = {
   1003: {
     code: 1003,
     msg: '暂无数据！'
+  },
+  1004: {
+    code: 1004,
+    msg: '账号已存在！'
   },
   1005: {
     code: 1005,

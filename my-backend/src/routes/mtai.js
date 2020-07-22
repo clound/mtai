@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:56:29
- * @LastEditTime: 2020-07-11 22:53:41
+ * @LastEditTime: 2020-07-22 10:35:41
  */ 
 const Router = require('koa-router')
 const router = new Router()
@@ -12,8 +12,8 @@ const mtuserController = require('../controllers').mtuser
 const Tips = require('../utils/tips')
 const util = require('../utils/tools')
 
-router.get('/getusers', async (ctx, next) => {
-  await mtuserController.getUsers(ctx)
+router.get('/getAccounts', async (ctx, next) => {
+  await mtuserController.getAccounts(ctx)
 })
 router.post('/importAccounts', async (ctx, next) => {
   await mtuserController.bulkCreate(ctx)
@@ -32,9 +32,15 @@ router.post('/addAccount', async (ctx, next) => {
   //   passwd: '123456'
   // }]
   await mtuserController.create(ctx)
-
 })
-router.get('/refreshInfo', async (ctx, next) => {
+
+router.post('/updateAccount', async (ctx, next) => {
+  await mtuserController.update(ctx)
+})
+router.post('/deleteAccount', async (ctx, next) => {
+  await mtuserController.delete(ctx)
+})
+router.get('/refreshAccount', async (ctx, next) => {
   ctx.body = {
     ...Tips[0]
   }
