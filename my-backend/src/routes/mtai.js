@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:56:29
- * @LastEditTime: 2020-07-22 10:35:41
+ * @LastEditTime: 2020-07-29 18:01:12
  */ 
 const Router = require('koa-router')
 const router = new Router()
@@ -11,7 +11,18 @@ const mtaiController = require('../controllers').mtai
 const mtuserController = require('../controllers').mtuser
 const Tips = require('../utils/tips')
 const util = require('../utils/tools')
-
+const crypto = require('crypto')
+const publicKey = `-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbSCYMupAFFYE5vs1Zxu+77NB03lDoeKvsqLgGQndwdGSj5NppiDguoyTN0dHANlsG7zvhyauyueGx32LvcvfKuzfpGxMazwt91ivI+uL3ZbHkbOi74NUS8ob7Teol0iQO8ZAMmRL2fSPeDL0RHFUf4CN185lxlZ0egiM3kTarJQIDAQAB
+-----END PUBLIC KEY-----
+`;
+function encryptPasswd(str) {
+  const encodeData = crypto.publicEncrypt({
+    key: str,
+    padding: crypto.constants.RSA_PKCS1_PADDING
+  }, Buffer.from(data)).toString('base64')
+  return encodeData
+}
 router.get('/getAccounts', async (ctx, next) => {
   await mtuserController.getAccounts(ctx)
 })
@@ -46,10 +57,14 @@ router.get('/refreshAccount', async (ctx, next) => {
   }
   let res = await mtuserController.getReqUsers(ctx)
   if (!res.count) return
-  for (let k = 0; k < res.count; k ++) {
+  for (let k = 0; k < 1; k ++) {
     console.log('开始查询-----------', k)
     let { id: userId, phone, passwd, unique } = res.rows[k]
-    let loginINfo = await mtaiController.login({ phone, passwd, unique })
+    let loginINfo = await mtaiController.login({ 
+      phone,
+      passwd: encryptPasswd(passwd),
+      unique
+    })
     let loginResult = JSON.parse(loginINfo)
     let { userSession, id } = loginResult.data
     let userInfo = await mtaiController.getUserInfo({ unique, sessionId: userSession, userId: id })

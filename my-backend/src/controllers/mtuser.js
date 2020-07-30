@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:58:46
- * @LastEditTime: 2020-07-22 12:12:10
+ * @LastEditTime: 2020-07-22 13:54:05
  */ 
 const MtUser = require('../models').mtuser
 const MtUserInfo = require('../models').mtuserinfo
@@ -210,10 +210,10 @@ module.exports = {
   getAllUserInfo (ctx) {
     // console.log(ctx.request.body)
     let { id, name } = ctx.session.user
-    let { phone, choosed, page = 1, limit = 20 } = ctx.request.body
+    let { phone, choosed, page = 1, pageSize = 10 } = ctx.request.body
     return MtUser.findAndCountAll({
-      offset: (page - 1) * limit,
-      limit: limit,
+      offset: (page - 1) * pageSize,
+      limit: +pageSize,
       attributes: ['id', 'phone'],
       include:{
         model: MtUserInfo,
