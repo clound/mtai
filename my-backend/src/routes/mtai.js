@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:56:29
- * @LastEditTime: 2020-07-29 18:01:12
+ * @LastEditTime: 2020-07-30 11:42:53
  */ 
 const Router = require('koa-router')
 const router = new Router()
@@ -12,15 +12,19 @@ const mtuserController = require('../controllers').mtuser
 const Tips = require('../utils/tips')
 const util = require('../utils/tools')
 const crypto = require('crypto')
-const publicKey = `-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbSCYMupAFFYE5vs1Zxu+77NB03lDoeKvsqLgGQndwdGSj5NppiDguoyTN0dHANlsG7zvhyauyueGx32LvcvfKuzfpGxMazwt91ivI+uL3ZbHkbOi74NUS8ob7Teol0iQO8ZAMmRL2fSPeDL0RHFUf4CN185lxlZ0egiM3kTarJQIDAQAB
+const publicKey = `
+-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbSCYMupAFFYE5vs1Zxu+
+77NB03lDoeKvsqLgGQndwdGSj5NppiDguoyTN0dHANlsG7zvhyauyueGx32
+LvcvfKuzfpGxMazwt91ivI+uL3ZbHkbOi74NUS8ob7Teol0iQO8ZAMmRL2f
+SPeDL0RHFUf4CN185lxlZ0egiM3kTarJQIDAQAB
 -----END PUBLIC KEY-----
 `;
 function encryptPasswd(str) {
   const encodeData = crypto.publicEncrypt({
-    key: str,
+    key: publicKey,
     padding: crypto.constants.RSA_PKCS1_PADDING
-  }, Buffer.from(data)).toString('base64')
+  }, Buffer.from(str)).toString('base64')
   return encodeData
 }
 router.get('/getAccounts', async (ctx, next) => {
