@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:58:01
- * @LastEditTime: 2020-07-11 22:35:53
+ * @LastEditTime: 2020-08-28 10:50:35
  */
 const httpRequest = require('../libs/request')
 const tool = require('../utils/tools')
@@ -15,20 +15,24 @@ const APPLY_SHOP_URL = `${prefix}/app_timelimit/v1/dc-timelimit/presale/onlineDr
 const APPLY_STATUS_URL = `${prefix}/app_timelimit/v1/dc-timelimit/presale/getPreSaleActivity`
 let Headers = {
   host: 'app.crv.com.cn',
+  Connection:	'keep-alive',
+  language:	'zh-CN',
   'User-Agent':
     'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16B92',
-  channel: 'mobile',
-  appVersion: '3.1.0',
+  appVersion: '3.1.11',
   os: 'ios',
+  channel: 'ios',
   networkType: 'wifi',
   osVersion:	12.1,
-  subsiteId: 2,
+  subsiteId: 102,
   Accept: 'application/json, text/plain, */*',
   'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
   // unique:	'ios-55AC6BA3-EB07-4803-BC3C-E0CE2821A12F',
   appkey:	'ef1fc57c13007e33',
+  'X-Requested-With':	'com.crv.wanjia',
   addressId: '',
-  Referer: 'http://localhost:8080/var/containers/Bundle/Application/E5DEBCE0-F946-45CB-826C-FC6441FEE7CF/%E5%8D%8E%E6%B6%A6%E4%B8%87%E5%AE%B6.app/www/index.html'
+  appHref: 'http://localhost:8080/var/mobile/Containers/Data/Application/3A0BD31B-0FCB-45CC-9480-7CAEF813B2DA/Library/Application%20Support/3.1.11/index.html?cordova_js_bootstrap_resource=/var/containers/Bundle/Application/E34B0004-D782-4646-8354-A7CA6EBACD13/%E5%8D%8E%E6%B6%A6%E4%B8%87%E5%AE%B6.app/www/cordova.js#/tabs/appIndex/preSaleSelfMentionTwo?preSaleRuleId=118&title=53%E5%BA%A6500ml%E9%A3%9E%E5%A4%A9%E8%8C%85%E5%8F%B0%E9%85%92%E9%A2%84%E5%94%AE-%E6%8A%BD%E7%AD%BE',
+  Referer: 'http://localhost:8080/var/mobile/Containers/Data/Application/3A0BD31B-0FCB-45CC-9480-7CAEF813B2DA/Library/Application%20Support/3.1.11/index.html?cordova_js_bootstrap_resource=/var/containers/Bundle/Application/E34B0004-D782-4646-8354-A7CA6EBACD13/%E5%8D%8E%E6%B6%A6%E4%B8%87%E5%AE%B6.app/www/cordova.js'
 }
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 module.exports = {
