@@ -3,9 +3,8 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-06-17 10:48:00
- * @LastEditTime: 2020-07-10 10:05:32
+ * @LastEditTime: 2020-08-31 19:08:40
  */
-
 const Koa = require('koa')
 const session = require('koa-session')
 const KoaBody = require('koa-body')
@@ -17,6 +16,8 @@ const entryRoutes = require('./routes')
 // const ErrorRoutes = require('./routes/error-routes')
 const jwt = require('koa-jwt')
 const fs = require('fs')
+const { getmtsku } = require('./plugins/getmtsku')
+const util = require('./utils/tools')
 // import PluginLoader from './lib/PluginLoader'
 
 const app = new Koa()
@@ -83,6 +84,28 @@ if (env === 'development') {
   })
 }
 
+// 刷新库存
+try {
+  let paths = path.resolve(__dirname, 'plugins/time.txt')
+  // console.log(path.resolve(__dirname, 'plugins/time.txt'));
+  let r = 5
+  setInterval(async () => {
+    r = 5 + Math.floor(Math.random() * (15 - 5))
+    let fData = fs.readFileSync(paths)
+    // console.log(fData.toString(), util.parseTime(Date.now(), '{y}/{m}/{d}'));
+    if (fData.toString() !== util.parseTime(Date.now(), '{y}/{m}/{d}')) {
+      let res = await getmtsku()
+      if (res) {
+        fs.writeFileSync(paths, util.parseTime(Date.now(), '{y}/{m}/{d}'))
+      }
+      else console.log('继续监控中....');
+    } else {
+      console.log('今天已经上过库存并发送邮件了!');
+    }
+  }, r * 1000)
+} catch (error) {
+  console.log(error);
+}
 app.listen(SystemConfig.System.API_server_port)
 
 console.log(
