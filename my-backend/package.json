@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "./node_modules//bin/nodemon ./src/app.js",
-    "start": "node ./src/app.js"
+    "start": "node ./src/app.js",
+    "getshuMao": "node ./src/monitor/start.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
