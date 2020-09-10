@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-09-08 14:49:13
- * @LastEditTime: 2020-09-08 18:52:28
+ * @LastEditTime: 2020-09-10 10:42:33
  */
 const crypto = require('crypto')
 const { getmtsku, login, getUserInfo, addCart, presaleToken, order } = require('../plugins/getmtsku')
@@ -27,72 +27,78 @@ function encryptPasswd(str) {
 async function startMonitor ({ phone, passwd, mail, shop }) {
   let res = await getmtsku(shop)
   try {
-    let { products } = res.data
-    for (let k of products) {
-      let { goodsId, productId, ruleId, subsiteId } = k
-      // if (k.name.indexOf('天茅台') > -1 && k.stock > 0) {
-      if (k.name.indexOf('酒鼠年') > -1 && k.stock > 0) {
-        // clearInterval(timer)
-        const unique = `ios-${util.randomString(8)}-${util.randomString(4)}-${util.randomString(4)}-${util.randomString(4)}-${util.randomString(12)}`
-        let loginINfo = await login({
-          phone: phone,
-          passwd: encryptPasswd(passwd),
-          unique
-        })
-        let loginResult = JSON.parse(loginINfo)
-        let { userSession, id } = loginResult.data
-        let userInfo = await getUserInfo({ unique, sessionId: userSession, userId: id })
-        let userInfoResult = JSON.parse(userInfo)
-        let { ncmsMemberId, mobile } = userInfoResult.data
-        let cartInfo = await addCart({
-          activityId: 2,
-          ruleId,
-          goodsId,
-          productId,
-          ncmsMemberId,
-          mobile,
-          number: 6,
-          userId: id,
-          userSession,
-          unique
-        })
-        console.log(cartInfo)
-        let presale = await presaleToken({
-          presaleRuleId: ruleId,
-          subsiteId,
-          userId: id,
-          userSession,
-          unique
-        })
-        let presaleInfo = JSON.parse(presale)
-        console.log(presaleInfo)
-        let { data: { result } = {} } = presaleInfo
-        let orderInfo = await order({
-          token: result,
-          goodsId,
-          presaleRuleId: ruleId,
-          subsiteId,
-          userId: id,
-          userSession,
-          unique
-        })
-        let lastresult = JSON.parse(orderInfo)
-        console.log(lastresult)
-        if (lastresult.success) {
-          mailControl.sendMail({
-            to: mail,
-            subject: "支付提醒", // 可以不传
-            html: `<h1>锁单了，去支付吧！</h1>`
+    if (res.data && res.data.products.length) {
+      let { products = [] } = res.data
+      for (let k of products) {
+        let { goodsId, productId, ruleId, subsiteId } = k
+        // if (k.name.indexOf('天茅台') > -1 && k.stock > 0) {
+        if (k.name.indexOf('酒鼠年') > -1 && k.stock > 0) {
+          // clearInterval(timer)
+          const unique = `ios-${util.randomString(8)}-${util.randomString(4)}-${util.randomString(4)}-${util.randomString(4)}-${util.randomString(12)}`
+          let loginINfo = await login({
+            phone: phone,
+            passwd: encryptPasswd(passwd),
+            unique
           })
+          let loginResult = JSON.parse(loginINfo)
+          let { userSession, id } = loginResult.data
+          let userInfo = await getUserInfo({ unique, sessionId: userSession, userId: id })
+          let userInfoResult = JSON.parse(userInfo)
+          let { ncmsMemberId, mobile } = userInfoResult.data
+          let cartInfo = await addCart({
+            activityId: 2,
+            ruleId,
+            goodsId,
+            productId,
+            ncmsMemberId,
+            mobile,
+            number: 6,
+            userId: id,
+            userSession,
+            unique
+          })
+          console.log(cartInfo)
+          let presale = await presaleToken({
+            presaleRuleId: ruleId,
+            subsiteId,
+            userId: id,
+            userSession,
+            unique
+          })
+          let presaleInfo = JSON.parse(presale)
+          console.log(presaleInfo)
+          let { data: { result } = {} } = presaleInfo
+          let orderInfo = await order({
+            token: result,
+            goodsId,
+            presaleRuleId: ruleId,
+            subsiteId,
+            userId: id,
+            userSession,
+            unique
+          })
+          let lastresult = JSON.parse(orderInfo)
+          console.log(lastresult)
+          if (lastresult.success) {
+            mailControl.sendMail({
+              to: mail,
+              subject: "支付提醒", // 可以不传
+              html: `<h1>锁单了，去支付吧！</h1>`
+            })
+          }
+          return true
+        } else if (k.name.indexOf('酒鼠年') > -1) {
+          console.log('尚未更新库存');
+          setTimeout(() => {
+            startMonitor({phone, passwd, mail, shop})
+          }, 1000)
+          return false
         }
-        return true
-      } else if (k.name.indexOf('酒鼠年') > -1) {
-        console.log('尚未更新库存');
-        setTimeout(() => {
-          startMonitor({phone, passwd, mail, shop})
-        }, 1000)
-        return false
       }
+    } else {
+      setTimeout(() => {
+        startMonitor({phone, passwd, mail, shop})
+      }, 1000)
     }
   } catch (error) {
     console.log('getsku----', error);

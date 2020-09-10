@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-08-31 18:25:14
- * @LastEditTime: 2020-09-08 18:49:58
+ * @LastEditTime: 2020-09-10 10:44:24
  */
 const mail = require('./mail')
 const httpRequest = require('../libs/request')
@@ -97,20 +97,24 @@ function getmtsku(shop) {
   // let form = Object.assign({}, config.orderJson, {
   //   token
   // })
-  let options = {
-    method: 'GET',
-    uri: `${skuUrl}`,
-    // proxy: 'http://127.0.0.1:8888',
-    // rejectUnauthorized: false,
-    qs: {
-      // param: `{"activityId":"2","shopCode":"206076","longitude":116.41024359809028,"latitude":39.91640353732639}`
-      param: `${shop}`
-    },
-    // headers: Headers,
-    json: true
+  try {
+    let options = {
+      method: 'GET',
+      uri: `${skuUrl}`,
+      // proxy: 'http://127.0.0.1:8888',
+      // rejectUnauthorized: false,
+      qs: {
+        // param: `{"activityId":"2","shopCode":"206076","longitude":116.41024359809028,"latitude":39.91640353732639}`
+        param: `${shop}`
+      },
+      // headers: Headers,
+      json: true
+    }
+    // console.log(options)
+    return httpRequest(options, 'getmtsku')
+  } catch (error) {
+    throw new Error(error)
   }
-  // console.log(options)
-  return httpRequest(options, 'getmtsku')
 }
 /**
  * @return {
