@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-09-08 14:49:13
- * @LastEditTime: 2020-09-10 10:42:33
+ * @LastEditTime: 2020-09-11 14:24:33
  */
 const crypto = require('crypto')
 const { getmtsku, login, getUserInfo, addCart, presaleToken, order } = require('../plugins/getmtsku')
@@ -25,7 +25,9 @@ function encryptPasswd(str) {
   return encodeData
 }
 async function startMonitor ({ phone, passwd, mail, shop }) {
-  let res = await getmtsku(shop)
+  let res = await getmtsku(shop).catch(err=>{
+    console.log('获取失败', util.parseTime(Date.now()))
+  })
   try {
     if (res.data && res.data.products.length) {
       let { products = [] } = res.data
@@ -88,7 +90,7 @@ async function startMonitor ({ phone, passwd, mail, shop }) {
           }
           return true
         } else if (k.name.indexOf('酒鼠年') > -1) {
-          console.log('尚未更新库存');
+          console.log('尚未更新库存', util.parseTime(Date.now()));
           setTimeout(() => {
             startMonitor({phone, passwd, mail, shop})
           }, 1000)
