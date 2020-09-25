@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-08-31 18:25:14
- * @LastEditTime: 2020-09-10 10:44:24
+ * @LastEditTime: 2020-09-25 09:54:41
  */
 const mail = require('./mail')
 const httpRequest = require('../libs/request')
@@ -90,13 +90,10 @@ function getUserInfo(userInfo) {
   }
   return httpRequest(options, 'GetUserInfo')
 }
-function getmtsku(shop) {
-  // Headers = Object.assign({}, config.header, {
-  //   // cookie: config.orderCookie(token)
-  // })
-  // let form = Object.assign({}, config.orderJson, {
-  //   token
-  // })
+function getmtsku(shop, {unique, userId, userSession}) {
+  Headers = Object.assign({}, Headers, {
+    unique, userId, userSession
+  })
   try {
     let options = {
       method: 'GET',
@@ -107,7 +104,7 @@ function getmtsku(shop) {
         // param: `{"activityId":"2","shopCode":"206076","longitude":116.41024359809028,"latitude":39.91640353732639}`
         param: `${shop}`
       },
-      // headers: Headers,
+      headers: Headers,
       json: true
     }
     // console.log(options)

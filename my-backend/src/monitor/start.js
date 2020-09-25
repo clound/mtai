@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-09-08 14:49:13
- * @LastEditTime: 2020-09-11 14:24:33
+ * @LastEditTime: 2020-09-25 10:18:24
  */
 const crypto = require('crypto')
 const { getmtsku, login, getUserInfo, addCart, presaleToken, order } = require('../plugins/getmtsku')
@@ -24,8 +24,8 @@ function encryptPasswd(str) {
   }, Buffer.from(str)).toString('base64')
   return encodeData
 }
-async function startMonitor ({ phone, passwd, mail, shop }) {
-  let res = await getmtsku(shop).catch(err=>{
+async function startMonitor ({ phone, passwd, mail, shop }, {unique, userId, userSession} ) {
+  let res = await getmtsku(shop, {unique, userId, userSession}).catch(err=>{
     console.log('获取失败', util.parseTime(Date.now()))
   })
   try {
@@ -92,18 +92,21 @@ async function startMonitor ({ phone, passwd, mail, shop }) {
         } else if (k.name.indexOf('酒鼠年') > -1) {
           console.log('尚未更新库存', util.parseTime(Date.now()));
           setTimeout(() => {
-            startMonitor({phone, passwd, mail, shop})
+            startMonitor({phone, passwd, mail, shop}, {unique, userId, userSession})
           }, 1000)
           return false
         }
       }
     } else {
       setTimeout(() => {
-        startMonitor({phone, passwd, mail, shop})
+        startMonitor({phone, passwd, mail, shop}, {unique, userId, userSession})
       }, 1000)
     }
   } catch (error) {
     console.log('getsku----', error);
+    setTimeout(() => {
+      startMonitor({phone, passwd, mail, shop}, {unique, userId, userSession})
+    }, 1000)
   }
 }
 let Account = [{
@@ -117,6 +120,17 @@ let Account = [{
   mail: '1107542349@qq.com',
   shop: '{"activityId":"2","shopCode":"206076","longitude":116.41024359809028,"latitude":39.91640353732639}'
 }]
-Account.forEach(v => {
-  startMonitor(v)
-})
+async function enter() {
+    const unique = 'ios-55AC6223-EB07-1565-B112-E0CE2821A12F'
+    let loginINfo = await login({
+      phone: '15262477347',
+      passwd: encryptPasswd('yan123'),
+      unique
+    })
+    let loginResult = JSON.parse(loginINfo)
+    let { userSession, id } = loginResult.data
+    Account.forEach(v => {
+      startMonitor(v, { unique, userId: id, userSession })
+    })
+}
+enter()
