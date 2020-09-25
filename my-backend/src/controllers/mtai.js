@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:58:01
- * @LastEditTime: 2020-09-24 19:13:10
+ * @LastEditTime: 2020-09-25 09:34:50
  */
 const httpRequest = require('../libs/request')
 const tool = require('../utils/tools')
@@ -343,8 +343,8 @@ module.exports = {
     let options = {
       method: 'POST',
       uri: JIFEN_URL,
-      proxy: 'http://127.0.0.1:8888',
-      rejectUnauthorized: false,
+      // proxy: 'http://127.0.0.1:8888',
+      // rejectUnauthorized: false,
       qs: {
           param: queryString // -> uri + '?access_token=xxxxx%20xxxxx'
       },
