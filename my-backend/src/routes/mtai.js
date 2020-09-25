@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:56:29
- * @LastEditTime: 2020-09-25 09:23:51
+ * @LastEditTime: 2020-09-25 09:37:19
  */ 
 const Router = require('koa-router')
 const router = new Router()
@@ -95,7 +95,7 @@ router.get('/refreshAccount', async (ctx, next) => {
           transaction_time: v.transaction_time || ''
         }
       }) || []
-      console.log(jifenArr)
+      // console.log(jifenArr)
       let updateInfo = {
           userId,
           uname,
@@ -109,7 +109,7 @@ router.get('/refreshAccount', async (ctx, next) => {
           orderCreated,
           jifen: JSON.stringify(jifenArr)
         }
-        console.log(updateInfo)
+        // console.log(updateInfo)
     let lastInfo = await mtuserController.updateUserInfo(updateInfo)
     console.log(`${uname}/${phone}/${lastInfo?'插入':'更新'}记录`, util.parseTime(new Date(), '{y}/{m}/{d} {h}:{i}:{s}'))
   }
