@@ -83,9 +83,17 @@ class List extends PureComponent {
         )
       },
       {
-        title: '具体信息',
-        dataIndex: 'tipInfo',
-        // width: '20%'
+        title: '消费信息',
+        dataIndex: 'jifen',
+        textWrap: 'word-break',
+        width: '20%',
+        render: (text) => {
+          let jifenArr = (text && JSON.parse(text)) || []
+          return (
+            jifenArr.map(v => {
+              return <div style={{wordWrap:'break-word',wordBreak:'break-word'}}>消费时间：{v.transaction_time}/消费：{v.pay_amount|| 0}/积分：{v.points}</div>
+            })
+        )}
       },
       {
         title: '更新日期',

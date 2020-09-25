@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:58:01
- * @LastEditTime: 2020-08-28 10:50:35
+ * @LastEditTime: 2020-09-24 19:13:10
  */
 const httpRequest = require('../libs/request')
 const tool = require('../utils/tools')
@@ -13,6 +13,7 @@ const USERINFO_URL = `${prefix}/app_api/v1/dc-app-api/mobile/api/user/info`
 const LOGOUT_URL = `${prefix}/app_api/v1/dc-app-api/mobile/api/user/logout`
 const APPLY_SHOP_URL = `${prefix}/app_timelimit/v1/dc-timelimit/presale/onlineDraw/token`
 const APPLY_STATUS_URL = `${prefix}/app_timelimit/v1/dc-timelimit/presale/getPreSaleActivity`
+const JIFEN_URL = `${prefix}/app_api/v1/dc-app-api/mobile/api/point/queryPoints`
 let Headers = {
   host: 'app.crv.com.cn',
   Connection:	'keep-alive',
@@ -330,5 +331,26 @@ module.exports = {
       json: true
     }
     return httpRequest(options, 'getApplyStatus')
+  },
+  getJifenStatus(userInfo) {
+    let { userId, sessionId, unique } = userInfo
+    Headers = Object.assign({}, Headers, {
+      unique,
+      userId,
+      userSession: sessionId
+    })
+    let queryString = `{"page":"1","pageCount":"12","pointsType":"","storeCode":""}`
+    let options = {
+      method: 'POST',
+      uri: JIFEN_URL,
+      proxy: 'http://127.0.0.1:8888',
+      rejectUnauthorized: false,
+      qs: {
+          param: queryString // -> uri + '?access_token=xxxxx%20xxxxx'
+      },
+      headers: Headers,
+      json: true
+    }
+    return httpRequest(options, 'getJifenStatus')
   }
 }

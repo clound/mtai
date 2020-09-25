@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:50:08
- * @LastEditTime: 2020-07-11 22:47:12
+ * @LastEditTime: 2020-09-24 19:16:09
  */ 
 'use strict'
 
@@ -54,6 +54,12 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: true,
         defaultValue: false,
         comment: '订单是否创建'
+      },
+      jifen: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        defaultValue: '',
+        comment: '最新12条消费记录'
       },
       tipInfo: {
         type: DataTypes.STRING,

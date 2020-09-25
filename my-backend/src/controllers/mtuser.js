@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:58:46
- * @LastEditTime: 2020-07-22 13:54:05
+ * @LastEditTime: 2020-09-25 09:25:36
  */ 
 const MtUser = require('../models').mtuser
 const MtUserInfo = require('../models').mtuserinfo
@@ -163,7 +163,8 @@ module.exports = {
       cityName,
       shopName,
       limitDate,
-      orderCreated } = userInfo
+      orderCreated,
+      jifen } = userInfo
     return MtUserInfo.upsert({
       user_id: userId,
       uname,
@@ -173,7 +174,8 @@ module.exports = {
       choosedDay,
       city: cityName ? (cityName + shopName) : '',
       limitDate,
-      orderCreated 
+      orderCreated,
+      jifen
     })
   },
   // 获取所属用户数
@@ -218,7 +220,7 @@ module.exports = {
       include:{
         model: MtUserInfo,
         as: 'mtuserinfo',
-        ...(choosed === 'true' ? { where: { choosed } } : '')
+        ...(choosed === 'true' ? { where: { choosed: true } } : '')
       },
       where: {
         ...(name !== 'Clound602' ? { mtuser_id: id } : ''),
