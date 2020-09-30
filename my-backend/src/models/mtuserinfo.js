@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:50:08
- * @LastEditTime: 2020-09-24 19:16:09
+ * @LastEditTime: 2020-09-30 12:37:24
  */ 
 'use strict'
 
@@ -38,6 +38,12 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING,
         allowNull: true,
         comment: '中签时间'
+      },
+      zqgq: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        defaultValue: '',
+        comment: '中秋国庆活动'
       },
       city: {
         type: DataTypes.STRING,

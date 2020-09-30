@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:58:46
- * @LastEditTime: 2020-09-25 09:25:36
+ * @LastEditTime: 2020-09-30 12:42:58
  */ 
 const MtUser = require('../models').mtuser
 const MtUserInfo = require('../models').mtuserinfo
@@ -164,6 +164,7 @@ module.exports = {
       shopName,
       limitDate,
       orderCreated,
+      zqgqSignInfo,
       jifen } = userInfo
     return MtUserInfo.upsert({
       user_id: userId,
@@ -175,6 +176,7 @@ module.exports = {
       city: cityName ? (cityName + shopName) : '',
       limitDate,
       orderCreated,
+      zqgq: zqgqSignInfo,
       jifen
     })
   },

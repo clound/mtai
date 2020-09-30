@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:58:01
- * @LastEditTime: 2020-09-25 09:34:50
+ * @LastEditTime: 2020-09-30 12:25:42
  */
 const httpRequest = require('../libs/request')
 const tool = require('../utils/tools')
@@ -14,6 +14,7 @@ const LOGOUT_URL = `${prefix}/app_api/v1/dc-app-api/mobile/api/user/logout`
 const APPLY_SHOP_URL = `${prefix}/app_timelimit/v1/dc-timelimit/presale/onlineDraw/token`
 const APPLY_STATUS_URL = `${prefix}/app_timelimit/v1/dc-timelimit/presale/getPreSaleActivity`
 const JIFEN_URL = `${prefix}/app_api/v1/dc-app-api/mobile/api/point/queryPoints`
+const ZQGQURL = `${prefix}/app_timelimit/v1/dc-timelimit/presale/onlineDraw/token`
 let Headers = {
   host: 'app.crv.com.cn',
   Connection:	'keep-alive',
@@ -352,5 +353,28 @@ module.exports = {
       json: true
     }
     return httpRequest(options, 'getJifenStatus')
+  },
+  getZqgqActivity(userInfo) {
+    //{"presaleRuleId":"118","ncmsMemberId":"5729484290295891616","mobile":"18168066256","presaleTime":"","preSaleTimeId":352}
+    //{"presaleRuleId":"131","ncmsMemberId":"5729484290295891616","mobile":"18168066256","presaleTime":"","preSaleTimeId":366}
+    let { userId, sessionId, mobile, ncmsMemberId, unique } = userInfo
+    Headers = Object.assign({}, Headers, {
+      unique,
+      userId,
+      userSession: sessionId
+    })
+    let queryString = `{"presaleRuleId":"131","ncmsMemberId":"${ncmsMemberId}","mobile":"${mobile}","presaleTime":"${tool.parseTime(new Date(), '{y}/{m}/{d}')} 22:00","preSaleTimeId":366}`
+    let options = {
+      method: 'GET',
+      uri: APPLY_SHOP_URL,
+      // proxy: 'http://127.0.0.1:8888',
+      // rejectUnauthorized: false,
+      qs: {
+          param: queryString // -> uri + '?access_token=xxxxx%20xxxxx'
+      },
+      headers: Headers,
+      json: true
+    }
+    return httpRequest(options, 'getZqgqActivity')
   }
 }

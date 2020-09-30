@@ -39,7 +39,7 @@ class List extends PureComponent {
       {
         title: '账号',
         dataIndex: 'phone',
-        width: '10%',
+        width: '5%',
       },
       {
         title: '姓名',
@@ -49,7 +49,7 @@ class List extends PureComponent {
       {
         title: '手机号',
         dataIndex: 'mobile',
-        width: '10%',
+        width: '5%',
       },
       {
         title: '是否中签',
@@ -81,6 +81,20 @@ class List extends PureComponent {
         render: (bool) => (
           bool ? <Tag color="green">是</Tag> : <Tag>否</Tag>
         )
+      },
+      {
+        title: '中秋活动',
+        dataIndex: 'zqgq',
+        textWrap: 'word-break',
+        width: '20%',
+        render: (text) => {
+          let obj = (text && JSON.parse(text)) || {}
+          return (
+            <div style={{wordWrap:'break-word',wordBreak:'break-word'}}>
+              {obj['choosed'] ? <Tag color="green">是</Tag> : <Tag>否</Tag>}<br/>
+              申请店铺：{obj['cityName']}/{obj['shopName']}</div>
+          )
+        }
       },
       {
         title: '消费信息',

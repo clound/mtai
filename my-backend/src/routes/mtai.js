@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:56:29
- * @LastEditTime: 2020-09-25 09:37:19
+ * @LastEditTime: 2020-09-30 12:59:00
  */ 
 const Router = require('koa-router')
 const router = new Router()
@@ -65,17 +65,20 @@ router.get('/refreshAccount', async (ctx, next) => {
   for (let k = 0; k < res.count; k ++) {
     console.log('开始查询-----------', k)
     let { id: userId, phone, passwd, unique } = res.rows[k]
-    let loginINfo = await mtaiController.login({ 
+    let loginInfo = await mtaiController.login({ 
       phone,
       passwd: encryptPasswd(passwd),
       unique
     })
-    let loginResult = JSON.parse(loginINfo)
+    if (loginInfo.stateCode) continue
+    let loginResult = JSON.parse(loginInfo)
     let { userSession, id } = loginResult.data
     let userInfo = await mtaiController.getUserInfo({ unique, sessionId: userSession, userId: id })
+    if (userInfo.stateCode) continue
     let userInfoResult = JSON.parse(userInfo)
     let { uname, ncmsMemberId, mobile } = userInfoResult.data
     let applyInfo = await mtaiController.getApplyShop({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
+    if (applyInfo.stateCode) continue
     let { result, signInfo: {
       choosed = false, 
       choosedDay = '',
@@ -84,32 +87,43 @@ router.get('/refreshAccount', async (ctx, next) => {
       limitDate = '',
       orderCreated = false
     } = {} } = applyInfo.data.data
+    let zqgqSignInfo = ''
+    if (Date.now() < new Date('2020/10/03').getTime()) {
+      let zqgqInfo = await mtaiController.getZqgqActivity({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
+      console.log(zqgqInfo)
+      if (zqgqInfo.stateCode) continue
+
+      let { signInfo } = zqgqInfo.data.data
+      zqgqSignInfo = signInfo
+    }
+    console.log(zqgqSignInfo)
     let jifenInfo = await mtaiController.getJifenStatus({ unique, sessionId: userSession, userId: id })
-    // console.log(jifenInfo);
-      let { items } = jifenInfo.data
-      let jifenArr = items && items.map(v => {
-        return {
-          pay_amount: v.pay_amount || '',
-          store_name: v.store_name || '',
-          points: v.points || '',
-          transaction_time: v.transaction_time || ''
-        }
-      }) || []
-      // console.log(jifenArr)
-      let updateInfo = {
-          userId,
-          uname,
-          mobile,
-          result,
-          choosed, 
-          choosedDay,
-          cityName,
-          shopName,
-          limitDate,
-          orderCreated,
-          jifen: JSON.stringify(jifenArr)
-        }
-        // console.log(updateInfo)
+    if (jifenInfo.stateCode) continue
+    let { items } = jifenInfo.data
+    let jifenArr = items && items.map(v => {
+      return {
+        pay_amount: v.pay_amount || '',
+        store_name: v.store_name || '',
+        points: v.points || '',
+        transaction_time: v.transaction_time || ''
+      }
+    }) || []
+    // console.log(jifenArr)
+    let updateInfo = {
+      userId,
+      uname,
+      mobile,
+      result,
+      choosed, 
+      choosedDay,
+      cityName,
+      shopName,
+      limitDate,
+      orderCreated,
+      zqgqSignInfo: (zqgqSignInfo && JSON.stringify(zqgqSignInfo)) || '',
+      jifen: JSON.stringify(jifenArr)
+    }
+    // console.log(updateInfo)
     let lastInfo = await mtuserController.updateUserInfo(updateInfo)
     console.log(`${uname}/${phone}/${lastInfo?'插入':'更新'}记录`, util.parseTime(new Date(), '{y}/{m}/{d} {h}:{i}:{s}'))
   }
