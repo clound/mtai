@@ -363,7 +363,7 @@ module.exports = {
       userId,
       userSession: sessionId
     })
-    let queryString = `{"presaleRuleId":"131","ncmsMemberId":"${ncmsMemberId}","mobile":"${mobile}","presaleTime":"${tool.parseTime(new Date(), '{y}/{m}/{d}')} 22:00","preSaleTimeId":366}`
+    let queryString = `{"presaleRuleId":"134","ncmsMemberId":"${ncmsMemberId}","mobile":"${mobile}","presaleTime":"${tool.parseTime(new Date(), '{y}/{m}/{d}')} 22:00","preSaleTimeId":371}`
     let options = {
       method: 'GET',
       uri: APPLY_SHOP_URL,

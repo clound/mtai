@@ -55,6 +55,12 @@ router.post('/updateAccount', async (ctx, next) => {
 router.post('/deleteAccount', async (ctx, next) => {
   await mtuserController.delete(ctx)
 })
+function sleep() {
+  return new Promise(resolve => {
+    setTimeout(() => {resolve()}, 1000)
+  })
+}
+  
 router.get('/refreshAccount', async (ctx, next) => {
   ctx.body = {
     ...Tips[0]
@@ -62,8 +68,9 @@ router.get('/refreshAccount', async (ctx, next) => {
   let res = await mtuserController.getReqUsers(ctx)
   // console.log(res)
   if (!res.count) return
-  for (let k = 0; k < res.count; k ++) {
+  for (let k = 0; k < 1; k ++) {
     console.log('开始查询-----------', k)
+    await sleep()
     let { id: userId, phone, passwd, unique } = res.rows[k]
     let loginInfo = await mtaiController.login({ 
       phone,
@@ -88,15 +95,15 @@ router.get('/refreshAccount', async (ctx, next) => {
       orderCreated = false
     } = {} } = applyInfo.data.data
     let zqgqSignInfo = ''
-    if (Date.now() < new Date('2020/10/03').getTime()) {
+    if (Date.now() < new Date('2020/12/20').getTime()) {
       let zqgqInfo = await mtaiController.getZqgqActivity({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
-      console.log(zqgqInfo)
+      // console.log(zqgqInfo)
       if (zqgqInfo.stateCode) continue
 
       let { signInfo } = zqgqInfo.data.data
       zqgqSignInfo = signInfo
     }
-    console.log(zqgqSignInfo)
+    // console.log(zqgqSignInfo)
     let jifenInfo = await mtaiController.getJifenStatus({ unique, sessionId: userSession, userId: id })
     if (jifenInfo.stateCode) continue
     let { items } = jifenInfo.data
