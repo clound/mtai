@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:56:29
- * @LastEditTime: 2021-03-16 16:53:42
+ * @LastEditTime: 2021-03-16 17:16:29
  */
 const Router = require('koa-router')
 const router = new Router()
@@ -44,9 +44,9 @@ router.post('/updateAccount', async (ctx, next) => {
 router.post('/deleteAccount', async (ctx, next) => {
   await mtuserController.delete(ctx)
 })
-function sleep() {
+function sleep(t) {
   return new Promise(resolve => {
-    setTimeout(() => {resolve()}, 1000)
+    setTimeout(() => {resolve()}, t)
   })
 }
 router.get('/login', async (ctx, next) => {
@@ -181,7 +181,7 @@ router.get('/refreshAccount', async (ctx, next) => {
   let arr = []
   for (let k = 0; k < res.count; k ++) {
     console.log('开始查询-----------', k)
-    // await sleep()
+    await sleep(Math.ceil(Math.random()*5) * 1000)
     arr.push(handleData(res.rows[k]))
     if (arr.length === 8) {
       await Promise.all([...arr]).then(data => {
