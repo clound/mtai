@@ -3,8 +3,8 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:50:08
- * @LastEditTime: 2020-07-11 21:58:42
- */ 
+ * @LastEditTime: 2021-03-16 14:12:08
+ */
 'use strict'
 
 module.exports = function (sequelize, DataTypes) {
@@ -41,6 +41,11 @@ module.exports = function (sequelize, DataTypes) {
   MtUser.associate = function (models) {
     MtUser.hasOne(models.mtuserinfo, {
       as: 'mtuserinfo',
+      foreignKey: 'user_id',
+      targetKey: 'id',
+    })
+    MtUser.hasOne(models.mtusersession, {
+      as: 'mtUserSession',
       foreignKey: 'user_id',
       targetKey: 'id',
     })

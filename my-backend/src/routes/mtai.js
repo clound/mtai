@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:56:29
- * @LastEditTime: 2021-03-16 11:24:19
+ * @LastEditTime: 2021-03-16 16:53:42
  */
 const Router = require('koa-router')
 const router = new Router()
@@ -35,17 +35,6 @@ router.post('/importAccounts', async (ctx, next) => {
 
 })
 router.post('/addAccount', async (ctx, next) => {
-  // console.log(ctx.request.body)
-  // let data = [{
-  //   phone: '13256781234',
-  //   passwd: '123456'
-  // }, {
-  //   phone: '18052526354',
-  //   passwd: '211233'
-  // }, {
-  //   phone: '17153241625',
-  //   passwd: '123456'
-  // }]
   await mtuserController.create(ctx)
 })
 
@@ -60,32 +49,76 @@ function sleep() {
     setTimeout(() => {resolve()}, 1000)
   })
 }
-
-router.get('/refreshAccount', async (ctx, next) => {
-  ctx.body = {
-    ...Tips[0]
-  }
-  let res = await mtuserController.getReqUsers(ctx)
-  // console.log(res)
-  if (!res.count) return
-  for (let k = 0; k < res.count; k ++) {
-    console.log('开始查询-----------', k)
-    await sleep()
-    let { id: userId, phone, passwd, unique } = res.rows[k]
-    let loginInfo = await mtaiController.login({
-      phone,
-      passwd: encryptPasswd(passwd),
-      unique
+router.get('/login', async (ctx, next) => {
+  let res = await mtaiController.login(ctx)
+  let result = JSON.parse(res)
+  console.log(result, ctx.session)
+  ctx.session.sessionId = result.data.userSession
+  ctx.session.userId = result.data.id
+  ctx.body = res
+})
+router.get('/logout', async (ctx, next) => {
+  let res = await mtaiController.logout(ctx)
+  ctx.body = res
+})
+router.post('/getUserInfos', async (ctx, next) => {
+  await mtuserController.getAllUserInfo(ctx)
+})
+async function getUserSession(row) {
+  const { id: userId } = row
+  const uSession = await mtuserController.getMtUserSession({ id: userId })
+  return (uSession && uSession.usession) || null
+}
+function userLogin(row) {
+  const { id, phone, passwd, unique } = row
+  return mtaiController.login({
+    phone,
+    passwd: encryptPasswd(passwd),
+    unique
+  }).then(data => {
+    mtuserController.updataMtUserSession({
+      usession: data,
+      userId: id
     })
-    if (loginInfo.stateCode) continue
-    let loginResult = JSON.parse(loginInfo)
+    return data
+  })
+}
+async function getUserInfo(row, loginInfo) {
+  const { unique } = row
+  let loginResult = JSON.parse(loginInfo)
+  let { userSession, id } = loginResult.data
+  let userInfo = await mtaiController.getUserInfo({ unique, sessionId: userSession, userId: id })
+  let uInfo = (userInfo && JSON.parse(userInfo)) || {}
+  return uInfo
+}
+function handleData(row) {
+  // console.log(row)
+  return new Promise(async (resolve) => {
+    const { id: userId, unique, phone } = row
+    const uSession = await getUserSession(row)
+    let loginInfo = uSession
+    let loginResult = ''
+    if (!loginInfo) {
+      loginInfo = await userLogin(row)
+      loginResult = JSON.parse(loginInfo)
+      if (loginResult.stateCode) {resolve('failed'); return }
+    }
+    // console.log(loginInfo);
+    let uInfo = await getUserInfo(row, loginInfo)
+    if (uInfo.stateCode) {
+      if (uInfo.stateCode === 3){
+        loginInfo = await userLogin(row)
+        loginResult = JSON.parse(loginInfo)
+        if (loginResult.stateCode) {resolve('failed'); return }
+        uInfo = await getUserInfo(row, loginInfo)
+      }
+    }
+    loginResult = JSON.parse(loginInfo)
+    if (loginResult.stateCode) {resolve('failed'); return }
     let { userSession, id } = loginResult.data
-    let userInfo = await mtaiController.getUserInfo({ unique, sessionId: userSession, userId: id })
-    if (userInfo.stateCode) continue
-    let userInfoResult = JSON.parse(userInfo)
-    let { uname, ncmsMemberId, mobile } = userInfoResult.data
+    let { uname, ncmsMemberId, mobile } = uInfo.data
     let applyInfo = await mtaiController.getApplyShop({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
-    if (applyInfo.stateCode) continue
+    if (applyInfo.stateCode) {resolve('failed'); return }
     let { result, signInfo: {
       choosed = false,
       choosedDay = '',
@@ -97,18 +130,16 @@ router.get('/refreshAccount', async (ctx, next) => {
     let zqgqSignInfo = ''
     if (Date.now() < new Date('2020/12/20').getTime()) {
       let zqgqInfo = await mtaiController.getZqgqActivity({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
-      // console.log(zqgqInfo)
-      if (zqgqInfo.stateCode) continue
-      let { signInfo } = zqgqInfo.data.data
+      if (zqgqInfo.stateCode) {resolve('failed'); return }
+      const { signInfo } = zqgqInfo.data.data
       zqgqSignInfo = signInfo
     }
-
     // 获取15年茅台中签信息
     let mt15Info = await mtaiController.get15mtActivity({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
-    if (mt15Info.stateCode) continue
+    if (mt15Info.stateCode) {resolve('failed'); return }
     let { signInfo: mt15SignInfo } = mt15Info.data.data
     let jifenInfo = await mtaiController.getJifenStatus({ unique, sessionId: userSession, userId: id })
-    if (jifenInfo.stateCode) continue
+    if (jifenInfo.stateCode) {resolve('failed'); return }
 
     let { items } = jifenInfo.data
     let jifenArr = items && items.map(v => {
@@ -138,35 +169,27 @@ router.get('/refreshAccount', async (ctx, next) => {
     // console.log(updateInfo)
     let lastInfo = await mtuserController.updateUserInfo(updateInfo)
     console.log(`${uname}/${phone}/${lastInfo?'插入':'更新'}记录`, util.parseTime(new Date(), '{y}/{m}/{d} {h}:{i}:{s}'))
+    resolve(uname)
+  })
+}
+router.get('/refreshAccount', async (ctx, next) => {
+  ctx.body = {
+    ...Tips[0]
   }
-
+  let res = await mtuserController.getReqUsers(ctx)
+  if (!res.count) return
+  let arr = []
+  for (let k = 0; k < res.count; k ++) {
+    console.log('开始查询-----------', k)
+    // await sleep()
+    arr.push(handleData(res.rows[k]))
+    if (arr.length === 8) {
+      await Promise.all([...arr]).then(data => {
+        console.log(data)
+      })
+      arr.length = 0
+    }
+  }
 })
-router.get('/login', async (ctx, next) => {
-  let res = await mtaiController.login(ctx)
-  let result = JSON.parse(res)
-  console.log(result, ctx.session)
-  ctx.session.sessionId = result.data.userSession
-  ctx.session.userId = result.data.id
-  ctx.body = res
-})
-router.get('/logout', async (ctx, next) => {
-  let res = await mtaiController.logout(ctx)
-  ctx.body = res
-})
-router.post('/getUserInfos', async (ctx, next) => {
-  await mtuserController.getAllUserInfo(ctx)
-})
-// router.get('/getApplyShop', async (ctx, next) => {
-//   let res = await mtaiController.getApplyShop(ctx)
-//   console.log(res, typeof res)
-//   let result = res
-//   ctx.session.shopCode = (result.data.data.signInfo && result.data.data.signInfo.shopCode) || ''
-//   ctx.body = res
-// })
-// router.get('/getApplyStatus', async (ctx, next) => {
-//   let res = await mtaiController.getApplyStatus(ctx)
-//   ctx.body = res
-// })
-
 
 module.exports = router.routes()

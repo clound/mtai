@@ -3,10 +3,11 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:58:46
- * @LastEditTime: 2020-09-30 12:42:58
- */ 
+ * @LastEditTime: 2021-03-16 14:37:35
+ */
 const MtUser = require('../models').mtuser
 const MtUserInfo = require('../models').mtuserinfo
+const MtUserSession = require('../models').mtusersession
 const Tips = require('../utils/tips')
 const util = require('../utils/tools')
 // const util = require('util')
@@ -35,7 +36,7 @@ module.exports = {
         ...Tips[0]
       }
     })
-    .catch(error => 
+    .catch(error =>
       ctx.body = {
         error
       }
@@ -68,8 +69,7 @@ module.exports = {
         ...Tips[1009],
         error
       }
-    } 
-    )
+    })
   },
   delete(ctx) {
     let { id } = ctx.request.body
@@ -125,7 +125,7 @@ module.exports = {
       }
     })
     // console.log(users)
-    return MtUser.bulkCreate(users, { 
+    return MtUser.bulkCreate(users, {
       fields:["phone", "passwd", "unique", "mtuser_id"],
       updateOnDuplicate: ['passwd']
     })
@@ -152,31 +152,47 @@ module.exports = {
       }
     })
   },
+  getMtUserSession(userinfo) {
+    let { id } = userinfo
+    return MtUserSession.findOne({
+      attributes: ['id', 'usession'],
+      where: {user_id: id}
+    })
+  },
+  updataMtUserSession(userinfo) {
+    const { usession, userId } = userinfo
+    return MtUserSession.upsert({
+      usession,
+      user_id: userId
+    })
+  },
   // 更新用户信息
   updateUserInfo(userInfo) {
     let { userId,
       uname,
       mobile,
       result,
-      choosed, 
+      choosed,
       choosedDay,
       cityName,
       shopName,
       limitDate,
       orderCreated,
       zqgqSignInfo,
+      mt15SignInfo,
       jifen } = userInfo
     return MtUserInfo.upsert({
       user_id: userId,
       uname,
       mobile,
       tipInfo: result,
-      choosed, 
+      choosed,
       choosedDay,
       city: cityName ? (cityName + shopName) : '',
       limitDate,
       orderCreated,
       zqgq: zqgqSignInfo,
+      mt15: mt15SignInfo,
       jifen
     })
   },
@@ -230,7 +246,7 @@ module.exports = {
       }
     }).then(data => {
       ctx.body = {...Tips[0], data }
-    })   
+    })
     .catch(error => {
       console.log(error);
       ctx.body = { error }
