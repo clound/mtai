@@ -99,13 +99,17 @@ router.get('/refreshAccount', async (ctx, next) => {
       let zqgqInfo = await mtaiController.getZqgqActivity({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
       // console.log(zqgqInfo)
       if (zqgqInfo.stateCode) continue
-
       let { signInfo } = zqgqInfo.data.data
       zqgqSignInfo = signInfo
     }
-    // console.log(zqgqSignInfo)
+
+    // 获取15年茅台中签信息
+    let mt15Info = await mtaiController.get15mtActivity({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
+    if (mt15Info.stateCode) continue
+    let { signInfo: mt15SignInfo } = mt15Info.data.data
     let jifenInfo = await mtaiController.getJifenStatus({ unique, sessionId: userSession, userId: id })
     if (jifenInfo.stateCode) continue
+
     let { items } = jifenInfo.data
     let jifenArr = items && items.map(v => {
       return {
@@ -121,13 +125,14 @@ router.get('/refreshAccount', async (ctx, next) => {
       uname,
       mobile,
       result,
-      choosed, 
+      choosed,
       choosedDay,
       cityName,
       shopName,
       limitDate,
       orderCreated,
       zqgqSignInfo: (zqgqSignInfo && JSON.stringify(zqgqSignInfo)) || '',
+      mt15SignInfo: (mt15SignInfo && JSON.stringify(mt15SignInfo)) || '',
       jifen: JSON.stringify(jifenArr)
     }
     // console.log(updateInfo)

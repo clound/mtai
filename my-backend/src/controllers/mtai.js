@@ -3,7 +3,7 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:58:01
- * @LastEditTime: 2020-09-30 12:25:42
+ * @LastEditTime: 2021-03-16 10:24:22
  */
 const httpRequest = require('../libs/request')
 const tool = require('../utils/tools')
@@ -181,7 +181,7 @@ module.exports = {
           "stateCode": 0
         },
         "stateCode": 0
-      }      
+      }
       {
         "data": {
           "data": {
@@ -376,5 +376,43 @@ module.exports = {
       json: true
     }
     return httpRequest(options, 'getZqgqActivity')
+  },
+  get15mtActivity(userInfo) {
+    /**
+     * 	"data": {
+		"data": {
+			"result": "剔除退货后，上一自然周有积分消费不足3天次",
+			"hasDrawed": false,
+			"topImage": "http://appres.crv.com.cn/images/maotai/header_136.png",
+			"bottomImage": "http://appres.crv.com.cn/images/maotai/detail_136.png",
+			"datePeriod": "03月15日 00:00 ~ 03月18日 23:59",
+			"type": 0,
+			"noticeTime": "2021-03-19 22:00"
+		},
+		"stateCode": 0
+	},
+	"stateCode": 0
+     */
+    //{"presaleRuleId":"118","ncmsMemberId":"5729484290295891616","mobile":"18168066256","presaleTime":"","preSaleTimeId":352}
+    //{"presaleRuleId":"131","ncmsMemberId":"5729484290295891616","mobile":"18168066256","presaleTime":"","preSaleTimeId":366}
+    let { userId, sessionId, mobile, ncmsMemberId, unique } = userInfo
+    Headers = Object.assign({}, Headers, {
+      unique,
+      userId,
+      userSession: sessionId
+    })
+    let queryString = `{"presaleRuleId":"136","ncmsMemberId":"${ncmsMemberId}","mobile":"${mobile}","presaleTime":"${tool.parseTime(new Date(), '{y}/{m}/{d}')} 22:00","preSaleTimeId":373}`
+    let options = {
+      method: 'GET',
+      uri: APPLY_SHOP_URL,
+      // proxy: 'http://127.0.0.1:8888',
+      // rejectUnauthorized: false,
+      qs: {
+          param: queryString // -> uri + '?access_token=xxxxx%20xxxxx'
+      },
+      headers: Headers,
+      json: true
+    }
+    return httpRequest(options, 'get15mtActivity')
   }
 }

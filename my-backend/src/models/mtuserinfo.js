@@ -3,8 +3,8 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-10 12:50:08
- * @LastEditTime: 2020-09-30 12:37:24
- */ 
+ * @LastEditTime: 2021-03-16 11:04:34
+ */
 'use strict'
 
 module.exports = function (sequelize, DataTypes) {
@@ -44,6 +44,12 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: true,
         defaultValue: '',
         comment: '中秋国庆活动'
+      },
+      mt15: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        defaultValue: '',
+        comment: '15茅台中签活动'
       },
       city: {
         type: DataTypes.STRING,

@@ -32,61 +32,50 @@ class List extends PureComponent {
 
     const columns = [
       {
+        key: 'index',
         title: '序列',
         dataIndex: 'index',
         width: '5%',
+        fixed: 'left'
       },
       {
-        title: '账号',
+        key: 'phone',
+        title: '姓名/账号',
         dataIndex: 'phone',
-        width: '5%',
+        width: '15%',
+        fixed: 'left',
+        render: (value, row, index) => {
+          return (
+            <div style={{wordWrap:'break-word',wordBreak:'break-word'}}>
+              姓名：{row.uname || '无'}<br/>
+              账号：{row.phone || '无'}<br/>
+              手机号：{row.mobile || '无'}<br/>
+              </div>
+          )
+        }
       },
       {
-        title: '姓名',
-        dataIndex: 'uname',
-        width: '5%',
-      },
-      {
-        title: '手机号',
-        dataIndex: 'mobile',
-        width: '5%',
-      },
-      {
+        key: 'choosed',
         title: '是否中签',
         dataIndex: 'choosed',
-        width: '5%',
-        render: (bool) => (
-          bool ? <Tag color="green">中签</Tag> : <Tag>未中</Tag>
-        )
+        width: '15%',
+        render: (bool, row) => {
+          return (
+            <div style={{wordWrap:'break-word',wordBreak:'break-word'}}>
+              中签：{row.choosed? <Tag color="green">中签</Tag> : <Tag>未中</Tag>}<br/>
+              报名店铺：{row.city || '无'}<br/>
+              中签日期：{row.choosedDay || '无'}<br/>
+              截止下单时间：{row.limitDate || '无'}<br/>
+              订单创建：{row.orderCreated? <Tag color="green">是</Tag> : <Tag>否</Tag>}<br/>
+            </div>
+        )}
       },
       {
-        title: '报名店铺',
-        dataIndex: 'city',
-        // width: '20%',
-      },
-      {
-        title: '中签日期',
-        dataIndex: 'choosedDay',
-        // width: '20%',
-      },
-      {
-        title: '截止下单时间',
-        dataIndex: 'limitDate',
-        // width: '20%',
-      },
-      {
-        title: '订单创建',
-        dataIndex: 'limitDate',
-        width: '5%',
-        render: (bool) => (
-          bool ? <Tag color="green">是</Tag> : <Tag>否</Tag>
-        )
-      },
-      {
+        key: 'zqgq',
         title: '中秋活动',
         dataIndex: 'zqgq',
         textWrap: 'word-break',
-        width: '20%',
+        width: '15%',
         render: (text) => {
           let obj = (text && JSON.parse(text)) || {}
           return (
@@ -97,6 +86,22 @@ class List extends PureComponent {
         }
       },
       {
+        key: 'mt15',
+        title: '15茅台中签',
+        dataIndex: 'mt15',
+        textWrap: 'word-break',
+        width: '15%',
+        render: (text) => {
+          let obj = (text && JSON.parse(text)) || {}
+          return (
+            <div style={{wordWrap:'break-word',wordBreak:'break-word'}}>
+              {obj['choosed'] ? <Tag color="green">是</Tag> : <Tag>否</Tag>}<br/>
+              申请店铺：{obj['cityName']}/{obj['shopName']}</div>
+          )
+        }
+      },
+      {
+        key: 'jifen',
         title: '消费信息',
         dataIndex: 'jifen',
         textWrap: 'word-break',
@@ -110,8 +115,11 @@ class List extends PureComponent {
         )}
       },
       {
+        key: 'updatedAt',
         title: '更新日期',
         dataIndex: 'updatedAt',
+        fixed: 'right',
+        width: '10%',
         render: (time) => (
           <>
             {parseTime(time)}
@@ -119,6 +127,7 @@ class List extends PureComponent {
         )
       },
       {
+        key: 'operation',
         title: <Trans>Operation</Trans>,
         key: 'operation',
         fixed: 'right',
