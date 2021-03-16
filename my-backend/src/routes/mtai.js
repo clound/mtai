@@ -3,8 +3,8 @@
  * @version: 0.0.1
  * @Author: cloud
  * @Date: 2020-07-09 11:56:29
- * @LastEditTime: 2020-09-30 12:59:00
- */ 
+ * @LastEditTime: 2021-03-16 11:24:19
+ */
 const Router = require('koa-router')
 const router = new Router()
 const mtaiController = require('../controllers').mtai
@@ -60,7 +60,7 @@ function sleep() {
     setTimeout(() => {resolve()}, 1000)
   })
 }
-  
+
 router.get('/refreshAccount', async (ctx, next) => {
   ctx.body = {
     ...Tips[0]
@@ -68,11 +68,11 @@ router.get('/refreshAccount', async (ctx, next) => {
   let res = await mtuserController.getReqUsers(ctx)
   // console.log(res)
   if (!res.count) return
-  for (let k = 0; k < 1; k ++) {
+  for (let k = 0; k < res.count; k ++) {
     console.log('开始查询-----------', k)
     await sleep()
     let { id: userId, phone, passwd, unique } = res.rows[k]
-    let loginInfo = await mtaiController.login({ 
+    let loginInfo = await mtaiController.login({
       phone,
       passwd: encryptPasswd(passwd),
       unique
@@ -87,7 +87,7 @@ router.get('/refreshAccount', async (ctx, next) => {
     let applyInfo = await mtaiController.getApplyShop({ unique, sessionId: userSession, userId: id, ncmsMemberId, mobile })
     if (applyInfo.stateCode) continue
     let { result, signInfo: {
-      choosed = false, 
+      choosed = false,
       choosedDay = '',
       cityName = '',
       shopName = '',
